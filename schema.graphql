@@ -1,0 +1,77 @@
+type ApprovalForAll @entity {
+  id: ID!
+  owner: Bytes! # address
+  operator: Bytes! # address
+  approved: Boolean! # bool
+}
+
+type ConditionPreparation @entity {
+  id: ID!
+  conditionId: Bytes! # bytes32
+  oracle: Bytes! # address
+  questionId: Bytes! # bytes32
+  outcomeSlotCount: BigInt! # uint256
+}
+
+type ConditionResolution @entity {
+  id: ID!
+  conditionId: Bytes! # bytes32
+  oracle: Bytes! # address
+  questionId: Bytes! # bytes32
+  outcomeSlotCount: BigInt! # uint256
+  payoutNumerators: [BigInt]! # uint256[]
+}
+
+type PayoutRedemption @entity {
+  id: ID!
+  redeemer: Bytes! # address
+  collateralToken: Bytes! # address
+  parentCollectionId: Bytes! # bytes32
+  conditionId: Bytes! # bytes32
+  indexSets: [BigInt]! # uint256[]
+  payout: BigInt! # uint256
+}
+
+type PositionSplit @entity {
+  id: ID!
+  stakeholder: Bytes! # address
+  collateralToken: Bytes! # address
+  parentCollectionId: Bytes! # bytes32
+  conditionId: Bytes! # bytes32
+  partition: [BigInt]! # uint256[]
+  amount: BigInt! # uint256
+}
+
+type PositionsMerge @entity {
+  id: ID!
+  stakeholder: Bytes! # address
+  collateralToken: Bytes! # address
+  parentCollectionId: Bytes! # bytes32
+  conditionId: Bytes! # bytes32
+  partition: [BigInt]! # uint256[]
+  amount: BigInt! # uint256
+}
+
+type TransferBatch @entity {
+  id: ID!
+  operator: Bytes! # address
+  from: Bytes! # address
+  to: Bytes! # address
+  ids: [BigInt]! # uint256[]
+  values: [BigInt]! # uint256[]
+}
+
+type TransferSingle @entity {
+  id: ID!
+  operator: Bytes! # address
+  from: Bytes! # address
+  to: Bytes! # address
+  id: BigInt! # uint256
+  value: BigInt! # uint256
+}
+
+type URI @entity {
+  id: ID!
+  value: String! # string
+  id: BigInt! # uint256
+}
