@@ -1,6 +1,6 @@
 specVersion: 0.0.4
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: ConditionalTokens
@@ -25,19 +25,23 @@ dataSources:
         - URI
       abis:
         - name: ConditionalTokens
-          file: ./abis/ConditionalTokens.json
+          file: ConditionalTokens\abis\ConditionalTokens.json
       eventHandlers:
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
         - event: ConditionPreparation(indexed bytes32,indexed address,indexed bytes32,uint256)
           handler: handleConditionPreparation
-        - event: ConditionResolution(indexed bytes32,indexed address,indexed bytes32,uint256,uint256[])
+        - event: ConditionResolution(indexed bytes32,indexed address,indexed
+            bytes32,uint256,uint256[])
           handler: handleConditionResolution
-        - event: PayoutRedemption(indexed address,indexed address,indexed bytes32,bytes32,uint256[],uint256)
+        - event: PayoutRedemption(indexed address,indexed address,indexed
+            bytes32,bytes32,uint256[],uint256)
           handler: handlePayoutRedemption
-        - event: PositionSplit(indexed address,address,indexed bytes32,indexed bytes32,uint256[],uint256)
+        - event: PositionSplit(indexed address,address,indexed bytes32,indexed
+            bytes32,uint256[],uint256)
           handler: handlePositionSplit
-        - event: PositionsMerge(indexed address,address,indexed bytes32,indexed bytes32,uint256[],uint256)
+        - event: PositionsMerge(indexed address,address,indexed bytes32,indexed
+            bytes32,uint256[],uint256)
           handler: handlePositionsMerge
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatch
@@ -45,4 +49,4 @@ dataSources:
           handler: handleTransferSingle
         - event: URI(string,indexed uint256)
           handler: handleURI
-      file: ./src/conditional-tokens.ts
+      file: ConditionalTokens\ConditionalTokens.wasm
