@@ -14,39 +14,29 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - ApprovalForAll
-        - ConditionPreparation
-        - ConditionResolution
-        - PayoutRedemption
-        - PositionSplit
-        - PositionsMerge
-        - TransferBatch
-        - TransferSingle
-        - URI
+        - Condition
+        - FixedProductMarketMaker
+        - Split
+        - Merge
+        - Redemption
       abis:
         - name: ConditionalTokens
           file: ConditionalTokens\abis\ConditionalTokens.json
+        - name: ERC20Detailed
+          file: ConditionalTokens\abis\ERC20Detailed.json
       eventHandlers:
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
         - event: ConditionPreparation(indexed bytes32,indexed address,indexed bytes32,uint256)
           handler: handleConditionPreparation
         - event: ConditionResolution(indexed bytes32,indexed address,indexed
             bytes32,uint256,uint256[])
           handler: handleConditionResolution
-        - event: PayoutRedemption(indexed address,indexed address,indexed
-            bytes32,bytes32,uint256[],uint256)
-          handler: handlePayoutRedemption
         - event: PositionSplit(indexed address,address,indexed bytes32,indexed
             bytes32,uint256[],uint256)
           handler: handlePositionSplit
         - event: PositionsMerge(indexed address,address,indexed bytes32,indexed
             bytes32,uint256[],uint256)
           handler: handlePositionsMerge
-        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
-          handler: handleTransferBatch
-        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
-          handler: handleTransferSingle
-        - event: URI(string,indexed uint256)
-          handler: handleURI
+        - event: PayoutRedemption(indexed address,indexed address,indexed
+            bytes32,bytes32,uint256[],uint256)
+          handler: handlePayoutRedemption
       file: ConditionalTokens\ConditionalTokens.wasm

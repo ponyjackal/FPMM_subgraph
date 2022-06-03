@@ -1,75 +1,77 @@
-type ApprovalForAll @entity {
+type Collateral @entity {
+  "Token address"
   id: ID!
-  owner: Bytes! # address
-  operator: Bytes! # address
-  approved: Boolean! # bool
+  name: String!
+  symbol: String!
+  decimals: Int!
 }
 
-type ConditionPreparation @entity {
+type Condition @entity {
   id: ID!
-  conditionId: Bytes! # bytes32
-  oracle: Bytes! # address
-  questionId: Bytes! # bytes32
-  outcomeSlotCount: BigInt! # uint256
+  "Address which can resolve this condition"
+  oracle: Bytes!
+  "Question ID which corresponds to this condition"
+  questionId: Bytes!
+  "Number of possible outcomes for this condition"
+  outcomeSlotCount: Int!
+  "Timestamp at which this condition was resolved"
+  resolutionTimestamp: BigInt
+  "Fraction of collateral assigned to each outcome"
+  payouts: [BigDecimal!]
+  payoutNumerators: [BigInt!]
+  payoutDenominator: BigInt
+  "Market makers which are trading on this condition"
+  resolutionHash: Bytes
 }
 
-type ConditionResolution @entity {
+type Split @entity {
+  "Transaction Hash"
   id: ID!
-  conditionId: Bytes! # bytes32
-  oracle: Bytes! # address
-  questionId: Bytes! # bytes32
-  outcomeSlotCount: BigInt! # uint256
-  payoutNumerators: [BigInt!]! # uint256[]
+  "Timestamp at which split occurred"
+  timestamp: BigInt!
+  "Address which is performing this split"
+  stakeholder: String!
+  "Token which is collateralising positions being split"
+  collateralToken: Collateral!
+  parentCollectionId: Bytes!
+  "Condition on which split is occuring"
+  condition: Condition!
+  partition: [BigInt!]!
+  "The amount of collateral/outcome tokens being split"
+  amount: BigInt!
 }
 
-type PayoutRedemption @entity {
+type Merge @entity {
+  "Transaction Hash"
   id: ID!
-  redeemer: Bytes! # address
-  collateralToken: Bytes! # address
-  parentCollectionId: Bytes! # bytes32
-  conditionId: Bytes! # bytes32
-  indexSets: [BigInt!]! # uint256[]
-  payout: BigInt! # uint256
+  "Timestamp at which merge occurred"
+  timestamp: BigInt!
+  "Address which is performing this merge"
+  stakeholder: String!
+  "Token which is collateralising positions being merged"
+  collateralToken: Collateral!
+  parentCollectionId: Bytes!
+  "Condition on which merge is occuring"
+  condition: Condition!
+  partition: [BigInt!]!
+  "The amount of outcome tokens being merged"
+  amount: BigInt!
 }
 
-type PositionSplit @entity {
+type Redemption @entity {
+  "Transaction Hash"
   id: ID!
-  stakeholder: Bytes! # address
-  collateralToken: Bytes! # address
-  parentCollectionId: Bytes! # bytes32
-  conditionId: Bytes! # bytes32
-  partition: [BigInt!]! # uint256[]
-  amount: BigInt! # uint256
-}
-
-type PositionsMerge @entity {
-  id: ID!
-  stakeholder: Bytes! # address
-  collateralToken: Bytes! # address
-  parentCollectionId: Bytes! # bytes32
-  conditionId: Bytes! # bytes32
-  partition: [BigInt!]! # uint256[]
-  amount: BigInt! # uint256
-}
-
-type TransferBatch @entity {
-  id: ID!
-  operator: Bytes! # address
-  from: Bytes! # address
-  to: Bytes! # address
-  ids: [BigInt!]! # uint256[]
-  values: [BigInt!]! # uint256[]
-}
-
-type TransferSingle @entity {
-  id: ID!
-  operator: Bytes! # address
-  from: Bytes! # address
-  to: Bytes! # address
-  value: BigInt! # uint256
-}
-
-type URI @entity {
-  id: ID!
-  value: String! # string
+  "Timestamp at which redemption occurred"
+  timestamp: BigInt!
+  "Address which is redeeming these outcomes"
+  redeemer: String!
+  "Token which is being claimed in return for outcome tokens"
+  collateralToken: Collateral!
+  parentCollectionId: Bytes!
+  "Condition on which redemption is occuring"
+  condition: Condition!
+  "Outcomes which are being redeemed"
+  indexSets: [BigInt!]!
+  "The amount of collateral being claimed"
+  payout: BigInt!
 }
