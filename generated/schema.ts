@@ -8,7 +8,7 @@ import {
   store,
   Bytes,
   BigInt,
-  BigDecimal,
+  BigDecimal
 } from "@graphprotocol/graph-ts";
 
 export class ApprovalForAll extends Entity {
@@ -578,14 +578,14 @@ export class TransferSingle extends Entity {
     return changetype<TransferSingle | null>(store.get("TransferSingle", id));
   }
 
-  // get id(): string {
-  //   let value = this.get("id");
-  //   return value!.toString();
-  // }
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
 
-  // set id(value: string) {
-  //   this.set("id", Value.fromString(value));
-  // }
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
 
   get operator(): Bytes {
     let value = this.get("operator");
@@ -612,15 +612,6 @@ export class TransferSingle extends Entity {
 
   set to(value: Bytes) {
     this.set("to", Value.fromBytes(value));
-  }
-
-  get id(): BigInt {
-    let value = this.get("id");
-    return value!.toBigInt();
-  }
-
-  set id(value: BigInt) {
-    this.set("id", Value.fromBigInt(value));
   }
 
   get value(): BigInt {
@@ -655,14 +646,14 @@ export class URI extends Entity {
     return changetype<URI | null>(store.get("URI", id));
   }
 
-  // get id(): string {
-  //   let value = this.get("id");
-  //   return value!.toString();
-  // }
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
 
-  // set id(value: string) {
-  //   this.set("id", Value.fromString(value));
-  // }
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
 
   get value(): string {
     let value = this.get("value");
@@ -671,14 +662,5 @@ export class URI extends Entity {
 
   set value(value: string) {
     this.set("value", Value.fromString(value));
-  }
-
-  get id(): BigInt {
-    let value = this.get("id");
-    return value!.toBigInt();
-  }
-
-  set id(value: BigInt) {
-    this.set("id", Value.fromBigInt(value));
   }
 }
