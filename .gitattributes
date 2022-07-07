@@ -1,0 +1,8 @@
+# Normalize all line endings for text files to be linux line endings
+*.graphql text eol=fl
+*.json text eol=fl
+*.yaml text eol=fl
+*.ts text eol=fl
+*.js text eol=fl
+*.md text eol=fl
+yarn.lock text eol=fl

@@ -1,22 +1,22 @@
 /* eslint-disable no-param-reassign */
-import { BigInt, ethereum, log } from '@graphprotocol/graph-ts';
+import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   FixedProductMarketMaker,
   MarketPosition,
   Transaction,
   Condition,
-} from '../../generated/schema';
+} from "../../generated/schema";
 import {
   PositionsMerge,
   PositionSplit,
   PayoutRedemption,
-} from '../../generated/ConditionalTokens/ConditionalTokens';
+} from "../../generated/ConditionalTokens/ConditionalTokens";
 import {
   FPMMFundingAdded,
   FPMMFundingRemoved,
-} from '../../generated/templates/FixedProductMarketMaker/FixedProductMarketMaker';
-import { bigZero } from './constants';
-import { max, timesBD } from './maths';
+} from "../../generated/templates/FixedProductMarketMaker/FixedProductMarketMaker";
+import { bigZero } from "./constants";
+import { max, timesBD } from "./maths";
 
 /*
  * Returns the user's position for the given market and outcome
@@ -25,7 +25,7 @@ import { max, timesBD } from './maths';
 export function getMarketPosition(
   user: string,
   market: string,
-  outcomeIndex: BigInt,
+  outcomeIndex: BigInt
 ): MarketPosition {
   let positionId = user + market + outcomeIndex.toString();
   let position = MarketPosition.load(positionId);
@@ -56,8 +56,8 @@ function updateNetPositionAndSave(position: MarketPosition): void {
   //       to another address in order to sell them.
   if (position.netQuantity.lt(bigZero)) {
     log.error(
-      'Invalid position: user {} has negative netQuantity on outcome {} on market {}',
-      [position.user, position.outcomeIndex.toString(), position.market],
+      "Invalid position: user {} has negative netQuantity on outcome {} on market {}",
+      [position.user, position.outcomeIndex.toString(), position.market]
     );
   }
 
@@ -67,25 +67,25 @@ function updateNetPositionAndSave(position: MarketPosition): void {
 export function updateMarketPositionFromTrade(event: ethereum.Event): void {
   let transaction = Transaction.load(event.transaction.hash.toHexString());
   if (transaction == null) {
-    log.error('Could not find a transaction with hash: {}', [
+    log.error("Could not find a transaction with hash: {}", [
       event.transaction.hash.toString(),
     ]);
-    throw new Error('Could not find transaction with hash');
+    throw new Error("Could not find transaction with hash");
   }
 
   let position = getMarketPosition(
     transaction.user,
     transaction.market,
-    transaction.outcomeIndex,
+    transaction.outcomeIndex
   );
 
   let fee = (FixedProductMarketMaker.load(
-    transaction.market,
+    transaction.market
   ) as FixedProductMarketMaker).fee;
 
-  if (transaction.type == 'Buy') {
+  if (transaction.type == "Buy") {
     position.quantityBought = position.quantityBought.plus(
-      transaction.outcomeTokensAmount,
+      transaction.outcomeTokensAmount
     );
     position.valueBought = position.valueBought.plus(transaction.tradeAmount);
 
@@ -96,14 +96,16 @@ export function updateMarketPositionFromTrade(event: ethereum.Event): void {
     position.feesPaid = position.feesPaid.plus(feeAmount);
   } else {
     position.quantitySold = position.quantitySold.plus(
-      transaction.outcomeTokensAmount,
+      transaction.outcomeTokensAmount
     );
     position.valueSold = position.valueSold.plus(transaction.tradeAmount);
 
     // feeAmount = returnAmount * (fee/(1-fee));
-    let feeAmount = transaction.tradeAmount
-      .times(fee)
-      .div(BigInt.fromI32(10).pow(18).minus(fee));
+    let feeAmount = transaction.tradeAmount.times(fee).div(
+      BigInt.fromI32(10)
+        .pow(18)
+        .minus(fee)
+    );
     position.feesPaid = position.feesPaid.plus(feeAmount);
   }
 
@@ -118,11 +120,11 @@ export function updateMarketPositionFromTrade(event: ethereum.Event): void {
  */
 export function updateMarketPositionsFromSplit(
   marketMakerAddress: string,
-  event: PositionSplit,
+  event: PositionSplit
 ): void {
   let userAddress = event.params.stakeholder.toHexString();
   let marketMaker = FixedProductMarketMaker.load(
-    marketMakerAddress,
+    marketMakerAddress
   ) as FixedProductMarketMaker;
   let outcomeTokenPrices = marketMaker.outcomeTokenPrices;
 
@@ -134,7 +136,7 @@ export function updateMarketPositionsFromSplit(
     let position = getMarketPosition(
       userAddress,
       marketMakerAddress,
-      BigInt.fromI32(outcomeIndex),
+      BigInt.fromI32(outcomeIndex)
     );
     // Event emits the amount of collateral to be split as `amount`
     position.quantityBought = position.quantityBought.plus(event.params.amount);
@@ -142,7 +144,7 @@ export function updateMarketPositionsFromSplit(
     // Distribute split value proportionately based on share value
     let splitValue = timesBD(
       event.params.amount,
-      outcomeTokenPrices[outcomeIndex],
+      outcomeTokenPrices[outcomeIndex]
     );
     position.valueBought = position.valueBought.plus(splitValue);
 
@@ -158,11 +160,11 @@ export function updateMarketPositionsFromSplit(
  */
 export function updateMarketPositionsFromMerge(
   marketMakerAddress: string,
-  event: PositionsMerge,
+  event: PositionsMerge
 ): void {
   let userAddress = event.params.stakeholder.toHexString();
   let marketMaker = FixedProductMarketMaker.load(
-    marketMakerAddress,
+    marketMakerAddress
   ) as FixedProductMarketMaker;
   let outcomeTokenPrices = marketMaker.outcomeTokenPrices;
 
@@ -174,7 +176,7 @@ export function updateMarketPositionsFromMerge(
     let position = getMarketPosition(
       userAddress,
       marketMakerAddress,
-      BigInt.fromI32(outcomeIndex),
+      BigInt.fromI32(outcomeIndex)
     );
     // Event emits the amount of outcome tokens to be merged as `amount`
     position.quantitySold = position.quantitySold.plus(event.params.amount);
@@ -182,7 +184,7 @@ export function updateMarketPositionsFromMerge(
     // Distribute merge value proportionately based on share value
     let mergeValue = timesBD(
       event.params.amount,
-      outcomeTokenPrices[outcomeIndex],
+      outcomeTokenPrices[outcomeIndex]
     );
     position.valueSold = position.valueSold.plus(mergeValue);
 
@@ -198,23 +200,23 @@ export function updateMarketPositionsFromMerge(
  */
 export function updateMarketPositionsFromRedemption(
   marketMakerAddress: string,
-  event: PayoutRedemption,
+  event: PayoutRedemption
 ): void {
   let userAddress = event.params.redeemer.toHexString();
   let condition = Condition.load(
-    event.params.conditionId.toHexString(),
+    event.params.conditionId.toHexString()
   ) as Condition;
 
   let payoutNumerators = condition.payoutNumerators as BigInt[];
   let payoutDenominator = condition.payoutDenominator as BigInt;
 
-  if (payoutNumerators == null || payoutDenominator == null) {
-    log.error(
-      'Failed to update market positions: condition {} has not resolved',
-      [condition.id],
-    );
-    return;
-  }
+  // if (payoutNumerators == null || payoutDenominator == null) {
+  //   log.error(
+  //     "Failed to update market positions: condition {} has not resolved",
+  //     [condition.id]
+  //   );
+  //   return;
+  // }
 
   let indexSets = event.params.indexSets;
   for (let i = 0; i < indexSets.length; i += 1) {
@@ -230,7 +232,7 @@ export function updateMarketPositionsFromRedemption(
     let position = getMarketPosition(
       userAddress,
       marketMakerAddress,
-      BigInt.fromI32(outcomeIndex),
+      BigInt.fromI32(outcomeIndex)
     );
 
     // Redeeming a position is an all or nothing operation so use full balance for calculations
@@ -248,7 +250,7 @@ export function updateMarketPositionsFromRedemption(
 }
 
 export function updateMarketPositionFromLiquidityAdded(
-  event: FPMMFundingAdded,
+  event: FPMMFundingAdded
 ): void {
   let fpmmAddress = event.address.toHexString();
   let funder = event.params.funder.toHexString();
@@ -260,7 +262,7 @@ export function updateMarketPositionFromLiquidityAdded(
   let addedFunds = max(amountsAdded);
 
   let outcomeTokenPrices = (FixedProductMarketMaker.load(
-    fpmmAddress,
+    fpmmAddress
   ) as FixedProductMarketMaker).outcomeTokenPrices;
 
   // Funder is refunded with any excess outcome tokens which can't go into the market maker.
@@ -278,14 +280,14 @@ export function updateMarketPositionFromLiquidityAdded(
       let position = getMarketPosition(
         funder,
         fpmmAddress,
-        BigInt.fromI32(outcomeIndex),
+        BigInt.fromI32(outcomeIndex)
       );
 
       position.quantityBought = position.quantityBought.plus(refundedAmount);
 
       let refundValue = timesBD(
         refundedAmount,
-        outcomeTokenPrices[outcomeIndex],
+        outcomeTokenPrices[outcomeIndex]
       );
       position.valueBought = position.valueBought.plus(refundValue);
 
@@ -295,14 +297,14 @@ export function updateMarketPositionFromLiquidityAdded(
 }
 
 export function updateMarketPositionFromLiquidityRemoved(
-  event: FPMMFundingRemoved,
+  event: FPMMFundingRemoved
 ): void {
   let fpmmAddress = event.address.toHexString();
   let funder = event.params.funder.toHexString();
   let amountsRemoved = event.params.amountsRemoved;
 
   let outcomeTokenPrices = (FixedProductMarketMaker.load(
-    fpmmAddress,
+    fpmmAddress
   ) as FixedProductMarketMaker).outcomeTokenPrices;
 
   // The funder is sent all of the outcome tokens for which they were providing liquidity
@@ -315,7 +317,7 @@ export function updateMarketPositionFromLiquidityRemoved(
     let position = getMarketPosition(
       funder,
       fpmmAddress,
-      BigInt.fromI32(outcomeIndex),
+      BigInt.fromI32(outcomeIndex)
     );
 
     let amountRemoved = amountsRemoved[outcomeIndex];
