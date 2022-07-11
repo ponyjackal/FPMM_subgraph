@@ -34,7 +34,7 @@ function recordBuy(event: FPMMSingleBuy): void {
 }
 
 export function handleSingleBuy(event: FPMMSingleBuy): void {
-  let fpmmAddress = event.address.toHexString();
+  let fpmmAddress = event.params.market.toHexString();
   let fpmm = FixedProductMarketMaker.load(fpmmAddress);
   if (fpmm == null) {
     log.error("cannot buy: FixedProductMarketMaker instance for {} not found", [
